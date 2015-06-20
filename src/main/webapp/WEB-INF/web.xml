@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+  <display-name>DST Offset Change Reminder</display-name>
+  <description>
+    This application reminds you when the DST offset in your time zone changes.
+  </description>
+
+  <context-param>
+    <param-name>resteasy.scan</param-name>
+    <param-value>false</param-value>
+  </context-param>
+
+  <!-- set this if you map the Resteasy servlet to something other than /* -->
+  <context-param>
+    <param-name>resteasy.servlet.mapping.prefix</param-name>
+    <param-value>/feed</param-value>
+  </context-param>
+
+  <filter>
+    <filter-name>IPhone Filter</filter-name>
+    <filter-class>com.kenai.reminder.rest.IPhoneFilter</filter-class>
+  </filter>
+  
+  <filter-mapping>
+    <filter-name>IPhone Filter</filter-name>
+    <url-pattern>/</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+
+  <listener>
+    <listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
+  </listener>
+
+  <context-param>
+    <param-name>javax.ws.rs.Application</param-name>
+    <param-value>com.kenai.reminder.rest.TimeZoneApplication</param-value>
+  </context-param>
+  
+  <servlet>
+    <servlet-name>iPhone Suggest</servlet-name>
+    <servlet-class>com.kenai.reminder.rest.IPhoneTimeZoneSuggestServlet</servlet-class>
+  </servlet>
+  
+  <servlet>
+    <servlet-name>JSON Suggest</servlet-name>
+    <servlet-class>com.kenai.reminder.rest.JsonSuggestServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>Resteasy</servlet-name>
+    <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Resteasy</servlet-name>
+    <url-pattern>/feed/*</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>iPhone Suggest</servlet-name>
+    <url-pattern>/suggest/*</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>JSON Suggest</servlet-name>
+    <url-pattern>/timezones</url-pattern>
+  </servlet-mapping>
+
+  <error-page>
+    <error-code>404</error-code>
+    <location>/404.html</location>
+  </error-page>
+
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+  </welcome-file-list>
+
+</web-app>

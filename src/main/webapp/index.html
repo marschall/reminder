@@ -1,0 +1,367 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta content="index,follow" name="robots"/>
+  <meta content="text/javascript" http-equiv="Content-Script-Type"/>
+  <link rel="stylesheet" type="text/css" media="all" href="/_css/style.css"/>
+  <style type="text/css">
+    body {
+      background-color: #333333;
+      color: #ffffff;
+      /* cursor:pointer; */
+    }
+    
+    .bk {
+      position: absolute;
+      left: 50%;
+      margin-left: -222px;
+      top: 20px;
+      z-index: 1;
+    }
+    
+    div {
+      z-index: 2;
+    }
+    
+    #quote {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 20px;
+      padding: 0px;
+      font: normal normal normal 8pt 'Trebuchet MS', sans-serif;
+      color: #cfcfcf;
+      text-align: center;
+    }
+    
+    #box {
+      position: absolute;
+      left: 50%;
+      margin-left: -190px;
+      top: 48px;
+      width: 380px;
+      height: 478px;
+      background-color: transparent;
+      border: none;
+      padding: 0px;
+    }
+    
+    #wrapper,#menu,#header,#footer {
+      position: absolute;
+      left: 0;
+      width: 100%;
+    }
+    
+    #header {
+      top: 0;
+      height: 50px;
+      background-color: #333333;
+      font: normal normal normal 25pt 'Trebuchet MS', sans-serif;
+      color: #cc9933;
+      /* color:#ff9933; */
+      text-align: center;
+      letter-spacing: 20px;
+    }
+    
+    #menu {
+      top: 50px;
+      height: 10px;
+      text-align: right;
+      font: normal normal lighter 10pt 'Verdana', sans-serif;
+      color: #cccccc;
+      /* new */
+      letter-spacing: 2px;
+    }
+    
+    #menu a,#menu a:visited,#menu a:active {
+      color: #112233;
+      text-decoration: none;
+    }
+    
+    #menu a:hover {
+      color: #ff9933;
+      /* letter-spacing: 5px; */
+    }
+    
+    #wrapper {
+      top: 70px;
+      height: 256px;
+      /* overflow: scroll; */
+      /* new */
+      overflow: auto;
+    }
+    
+    .content {
+      width: 360px;
+      font: normal normal lighter 11pt 'Trebuchet MS', sans-serif;
+      color: #666666;
+      margin: 0px;
+      margin-bottom: 5px;
+      /* background-color: #f3f3f3; */
+      text-align: justify;
+    }
+    
+    .content_title {
+      font: normal normal bolder 15pt 'Trebuchet MS', sans-serif;
+      color: #3399cc;
+      /* new */
+      letter-spacing: 2px;
+    }
+    
+    
+    .content a {
+      color: #cc9933;
+    }
+    
+    /* new */
+    .content_comments {
+      padding-top: 5px;
+    }
+    /* new */
+    .content_comments a {
+      display: block;
+    }
+    
+    .content_details,.content_comments,.content_comments a,.content_comments a:visited,.content_comments a:active {
+      font: normal normal lighter 8pt 'Trebuchet MS', sans-serif;
+      /* color: #cfaaaa; */
+      color: #cf5555;
+      /* new */
+      font-size: 11pt;
+      /* new */
+      text-decoration: none;
+      /* new */
+      font-weight: bold;
+    }
+    
+    .content_comments a:hover {
+      color: #cf5555;
+    }
+    
+    .content_comments img,.content_title img {
+      border: none;
+      margin-top: 5px;
+      margin-right: 5px;
+    }
+    
+    #footer {
+      top: 331px;
+    }
+    
+    #footer img {
+      margin-top: 5px;
+      margin-right: 2px;
+      border: none;
+    }
+    
+    #footer img:hover {
+      border: 2px solid #333333;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    /* add autocomplete */
+    .ac_results {
+      padding: 0px;
+      border: 1px solid black;
+      background-color: white;
+      overflow: hidden;
+      z-index: 99999;
+    }
+    
+    .ac_results ul {
+      width: 100%;
+      list-style-position: outside;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .ac_results li {
+      margin: 0px;
+      padding: 2px 5px;
+      cursor: default;
+      display: block;
+      /* 
+      if width will be 100% horizontal scrollbar will apear 
+      when scroll mode will be used
+      */
+      /*width: 100%;*/
+      font: menu;
+      font-size: 12px;
+      /* 
+      it is very important, if line-height not setted or setted 
+      in relative units scroll will be broken in firefox
+      */
+      line-height: 16px;
+      overflow: hidden;
+      /* new */
+      color: #666666;
+    }
+    
+    .ac_odd {
+      background-color: #eee;
+    }
+    
+    .ac_over {
+      background-color: #0A246A;
+      color: white;
+    }
+  </style>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+  <script type="text/javascript" src="js/jquery.autocomplete.pack.js"></script>
+  <title>DST Offset Change Reminder</title>
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+  <link rel="icon" href="favicon.ico" type="image/x-icon"/>
+  <script type="text/javascript">
+    var timeZones = [{"id":"Africa/Cairo","name":"Eastern European Time","atomUrl":"/feed/Africa!Cairo.atom","icalUrl":"/feed/Africa!Cairo.ics"},{"id":"Africa/Ceuta","name":"Central European Summer Time","atomUrl":"/feed/Africa!Ceuta.atom","icalUrl":"/feed/Africa!Ceuta.ics"},{"id":"Africa/Windhoek","name":"Western African Summer Time","atomUrl":"/feed/Africa!Windhoek.atom","icalUrl":"/feed/Africa!Windhoek.ics"},{"id":"America/Adak","name":"Hawaii-Aleutian Daylight Time","atomUrl":"/feed/America!Adak.atom","icalUrl":"/feed/America!Adak.ics"},{"id":"America/Anchorage","name":"Alaska Daylight Time","atomUrl":"/feed/America!Anchorage.atom","icalUrl":"/feed/America!Anchorage.ics"},{"id":"America/Asuncion","name":"Paraguay Summer Time","atomUrl":"/feed/America!Asuncion.atom","icalUrl":"/feed/America!Asuncion.ics"},{"id":"America/Bahia_Banderas","name":"-05:00","atomUrl":"/feed/America!Bahia_Banderas.atom","icalUrl":"/feed/America!Bahia_Banderas.ics"},{"id":"America/Boise","name":"Mountain Daylight Time","atomUrl":"/feed/America!Boise.atom","icalUrl":"/feed/America!Boise.ics"},{"id":"America/Cambridge_Bay","name":"Mountain Daylight Time","atomUrl":"/feed/America!Cambridge_Bay.atom","icalUrl":"/feed/America!Cambridge_Bay.ics"},{"id":"America/Campo_Grande","name":"Amazon Time","atomUrl":"/feed/America!Campo_Grande.atom","icalUrl":"/feed/America!Campo_Grande.ics"},{"id":"America/Cancun","name":"Central Daylight Time","atomUrl":"/feed/America!Cancun.atom","icalUrl":"/feed/America!Cancun.ics"},{"id":"America/Chicago","name":"Central Daylight Time","atomUrl":"/feed/America!Chicago.atom","icalUrl":"/feed/America!Chicago.ics"},{"id":"America/Chihuahua","name":"Mountain Daylight Time","atomUrl":"/feed/America!Chihuahua.atom","icalUrl":"/feed/America!Chihuahua.ics"},{"id":"America/Cuiaba","name":"Amazon Time","atomUrl":"/feed/America!Cuiaba.atom","icalUrl":"/feed/America!Cuiaba.ics"},{"id":"America/Dawson","name":"Pacific Daylight Time","atomUrl":"/feed/America!Dawson.atom","icalUrl":"/feed/America!Dawson.ics"},{"id":"America/Denver","name":"Mountain Daylight Time","atomUrl":"/feed/America!Denver.atom","icalUrl":"/feed/America!Denver.ics"},{"id":"America/Detroit","name":"Eastern Daylight Time","atomUrl":"/feed/America!Detroit.atom","icalUrl":"/feed/America!Detroit.ics"},{"id":"America/Edmonton","name":"Mountain Daylight Time","atomUrl":"/feed/America!Edmonton.atom","icalUrl":"/feed/America!Edmonton.ics"},{"id":"America/Glace_Bay","name":"Atlantic Daylight Time","atomUrl":"/feed/America!Glace_Bay.atom","icalUrl":"/feed/America!Glace_Bay.ics"},{"id":"America/Godthab","name":"Western Greenland Summer Time","atomUrl":"/feed/America!Godthab.atom","icalUrl":"/feed/America!Godthab.ics"},{"id":"America/Goose_Bay","name":"Atlantic Daylight Time","atomUrl":"/feed/America!Goose_Bay.atom","icalUrl":"/feed/America!Goose_Bay.ics"},{"id":"America/Grand_Turk","name":"Eastern Daylight Time","atomUrl":"/feed/America!Grand_Turk.atom","icalUrl":"/feed/America!Grand_Turk.ics"},{"id":"America/Halifax","name":"Atlantic Daylight Time","atomUrl":"/feed/America!Halifax.atom","icalUrl":"/feed/America!Halifax.ics"},{"id":"America/Havana","name":"Cuba Daylight Time","atomUrl":"/feed/America!Havana.atom","icalUrl":"/feed/America!Havana.ics"},{"id":"America/Indiana/Indianapolis","name":"Eastern Daylight Time","atomUrl":"/feed/America!Indiana!Indianapolis.atom","icalUrl":"/feed/America!Indiana!Indianapolis.ics"},{"id":"America/Indiana/Knox","name":"Central Daylight Time","atomUrl":"/feed/America!Indiana!Knox.atom","icalUrl":"/feed/America!Indiana!Knox.ics"},{"id":"America/Indiana/Marengo","name":"Eastern Daylight Time","atomUrl":"/feed/America!Indiana!Marengo.atom","icalUrl":"/feed/America!Indiana!Marengo.ics"},{"id":"America/Indiana/Petersburg","name":"Eastern Daylight Time","atomUrl":"/feed/America!Indiana!Petersburg.atom","icalUrl":"/feed/America!Indiana!Petersburg.ics"},{"id":"America/Indiana/Tell_City","name":"Central Daylight Time","atomUrl":"/feed/America!Indiana!Tell_City.atom","icalUrl":"/feed/America!Indiana!Tell_City.ics"},{"id":"America/Indiana/Vevay","name":"Eastern Daylight Time","atomUrl":"/feed/America!Indiana!Vevay.atom","icalUrl":"/feed/America!Indiana!Vevay.ics"},{"id":"America/Indiana/Vincennes","name":"Eastern Daylight Time","atomUrl":"/feed/America!Indiana!Vincennes.atom","icalUrl":"/feed/America!Indiana!Vincennes.ics"},{"id":"America/Indiana/Winamac","name":"Eastern Daylight Time","atomUrl":"/feed/America!Indiana!Winamac.atom","icalUrl":"/feed/America!Indiana!Winamac.ics"},{"id":"America/Inuvik","name":"Mountain Daylight Time","atomUrl":"/feed/America!Inuvik.atom","icalUrl":"/feed/America!Inuvik.ics"},{"id":"America/Iqaluit","name":"Eastern Daylight Time","atomUrl":"/feed/America!Iqaluit.atom","icalUrl":"/feed/America!Iqaluit.ics"},{"id":"America/Juneau","name":"Alaska Daylight Time","atomUrl":"/feed/America!Juneau.atom","icalUrl":"/feed/America!Juneau.ics"},{"id":"America/Kentucky/Louisville","name":"Eastern Daylight Time","atomUrl":"/feed/America!Kentucky!Louisville.atom","icalUrl":"/feed/America!Kentucky!Louisville.ics"},{"id":"America/Kentucky/Monticello","name":"Eastern Daylight Time","atomUrl":"/feed/America!Kentucky!Monticello.atom","icalUrl":"/feed/America!Kentucky!Monticello.ics"},{"id":"America/Los_Angeles","name":"Pacific Daylight Time","atomUrl":"/feed/America!Los_Angeles.atom","icalUrl":"/feed/America!Los_Angeles.ics"},{"id":"America/Matamoros","name":"Central Daylight Time","atomUrl":"/feed/America!Matamoros.atom","icalUrl":"/feed/America!Matamoros.ics"},{"id":"America/Mazatlan","name":"Mountain Daylight Time","atomUrl":"/feed/America!Mazatlan.atom","icalUrl":"/feed/America!Mazatlan.ics"},{"id":"America/Menominee","name":"Central Daylight Time","atomUrl":"/feed/America!Menominee.atom","icalUrl":"/feed/America!Menominee.ics"},{"id":"America/Merida","name":"Central Daylight Time","atomUrl":"/feed/America!Merida.atom","icalUrl":"/feed/America!Merida.ics"},{"id":"America/Mexico_City","name":"Central Daylight Time","atomUrl":"/feed/America!Mexico_City.atom","icalUrl":"/feed/America!Mexico_City.ics"},{"id":"America/Miquelon","name":"Pierre & Miquelon Daylight Time","atomUrl":"/feed/America!Miquelon.atom","icalUrl":"/feed/America!Miquelon.ics"},{"id":"America/Moncton","name":"Atlantic Daylight Time","atomUrl":"/feed/America!Moncton.atom","icalUrl":"/feed/America!Moncton.ics"},{"id":"America/Monterrey","name":"Central Daylight Time","atomUrl":"/feed/America!Monterrey.atom","icalUrl":"/feed/America!Monterrey.ics"},{"id":"America/Montevideo","name":"Uruguay Summer Time","atomUrl":"/feed/America!Montevideo.atom","icalUrl":"/feed/America!Montevideo.ics"},{"id":"America/Montreal","name":"Eastern Daylight Time","atomUrl":"/feed/America!Montreal.atom","icalUrl":"/feed/America!Montreal.ics"},{"id":"America/Nassau","name":"Eastern Daylight Time","atomUrl":"/feed/America!Nassau.atom","icalUrl":"/feed/America!Nassau.ics"},{"id":"America/New_York","name":"Eastern Daylight Time","atomUrl":"/feed/America!New_York.atom","icalUrl":"/feed/America!New_York.ics"},{"id":"America/Nipigon","name":"Eastern Daylight Time","atomUrl":"/feed/America!Nipigon.atom","icalUrl":"/feed/America!Nipigon.ics"},{"id":"America/Nome","name":"Alaska Daylight Time","atomUrl":"/feed/America!Nome.atom","icalUrl":"/feed/America!Nome.ics"},{"id":"America/North_Dakota/Center","name":"Central Daylight Time","atomUrl":"/feed/America!North_Dakota!Center.atom","icalUrl":"/feed/America!North_Dakota!Center.ics"},{"id":"America/North_Dakota/New_Salem","name":"Central Daylight Time","atomUrl":"/feed/America!North_Dakota!New_Salem.atom","icalUrl":"/feed/America!North_Dakota!New_Salem.ics"},{"id":"America/Ojinaga","name":"Mountain Daylight Time","atomUrl":"/feed/America!Ojinaga.atom","icalUrl":"/feed/America!Ojinaga.ics"},{"id":"America/Pangnirtung","name":"Eastern Daylight Time","atomUrl":"/feed/America!Pangnirtung.atom","icalUrl":"/feed/America!Pangnirtung.ics"},{"id":"America/Rainy_River","name":"Central Daylight Time","atomUrl":"/feed/America!Rainy_River.atom","icalUrl":"/feed/America!Rainy_River.ics"},{"id":"America/Rankin_Inlet","name":"Central Daylight Time","atomUrl":"/feed/America!Rankin_Inlet.atom","icalUrl":"/feed/America!Rankin_Inlet.ics"},{"id":"America/Resolute","name":"Central Daylight Time","atomUrl":"/feed/America!Resolute.atom","icalUrl":"/feed/America!Resolute.ics"},{"id":"America/Santa_Isabel","name":"Pacific Daylight Time","atomUrl":"/feed/America!Santa_Isabel.atom","icalUrl":"/feed/America!Santa_Isabel.ics"},{"id":"America/Santiago","name":"Chile Summer Time","atomUrl":"/feed/America!Santiago.atom","icalUrl":"/feed/America!Santiago.ics"},{"id":"America/Sao_Paulo","name":"Brasilia Time","atomUrl":"/feed/America!Sao_Paulo.atom","icalUrl":"/feed/America!Sao_Paulo.ics"},{"id":"America/Scoresbysund","name":"Eastern Greenland Summer Time","atomUrl":"/feed/America!Scoresbysund.atom","icalUrl":"/feed/America!Scoresbysund.ics"},{"id":"America/St_Johns","name":"Newfoundland Daylight Time","atomUrl":"/feed/America!St_Johns.atom","icalUrl":"/feed/America!St_Johns.ics"},{"id":"America/Thule","name":"Atlantic Daylight Time","atomUrl":"/feed/America!Thule.atom","icalUrl":"/feed/America!Thule.ics"},{"id":"America/Thunder_Bay","name":"Eastern Daylight Time","atomUrl":"/feed/America!Thunder_Bay.atom","icalUrl":"/feed/America!Thunder_Bay.ics"},{"id":"America/Tijuana","name":"Pacific Daylight Time","atomUrl":"/feed/America!Tijuana.atom","icalUrl":"/feed/America!Tijuana.ics"},{"id":"America/Toronto","name":"Eastern Daylight Time","atomUrl":"/feed/America!Toronto.atom","icalUrl":"/feed/America!Toronto.ics"},{"id":"America/Vancouver","name":"Pacific Daylight Time","atomUrl":"/feed/America!Vancouver.atom","icalUrl":"/feed/America!Vancouver.ics"},{"id":"America/Whitehorse","name":"Pacific Daylight Time","atomUrl":"/feed/America!Whitehorse.atom","icalUrl":"/feed/America!Whitehorse.ics"},{"id":"America/Winnipeg","name":"Central Daylight Time","atomUrl":"/feed/America!Winnipeg.atom","icalUrl":"/feed/America!Winnipeg.ics"},{"id":"America/Yakutat","name":"Alaska Daylight Time","atomUrl":"/feed/America!Yakutat.atom","icalUrl":"/feed/America!Yakutat.ics"},{"id":"America/Yellowknife","name":"Mountain Daylight Time","atomUrl":"/feed/America!Yellowknife.atom","icalUrl":"/feed/America!Yellowknife.ics"},{"id":"Antarctica/McMurdo","name":"New Zealand Daylight Time","atomUrl":"/feed/Antarctica!McMurdo.atom","icalUrl":"/feed/Antarctica!McMurdo.ics"},{"id":"Antarctica/Palmer","name":"Chile Summer Time","atomUrl":"/feed/Antarctica!Palmer.atom","icalUrl":"/feed/Antarctica!Palmer.ics"},{"id":"Asia/Amman","name":"Eastern European Summer Time","atomUrl":"/feed/Asia!Amman.atom","icalUrl":"/feed/Asia!Amman.ics"},{"id":"Asia/Anadyr","name":"Anadyr Summer Time","atomUrl":"/feed/Asia!Anadyr.atom","icalUrl":"/feed/Asia!Anadyr.ics"},{"id":"Asia/Baku","name":"Azerbaijan Summer Time","atomUrl":"/feed/Asia!Baku.atom","icalUrl":"/feed/Asia!Baku.ics"},{"id":"Asia/Beirut","name":"Eastern European Summer Time","atomUrl":"/feed/Asia!Beirut.atom","icalUrl":"/feed/Asia!Beirut.ics"},{"id":"Asia/Damascus","name":"Eastern European Summer Time","atomUrl":"/feed/Asia!Damascus.atom","icalUrl":"/feed/Asia!Damascus.ics"},{"id":"Asia/Gaza","name":"Eastern European Time","atomUrl":"/feed/Asia!Gaza.atom","icalUrl":"/feed/Asia!Gaza.ics"},{"id":"Asia/Irkutsk","name":"Irkutsk Summer Time","atomUrl":"/feed/Asia!Irkutsk.atom","icalUrl":"/feed/Asia!Irkutsk.ics"},{"id":"Asia/Jerusalem","name":"Israel Standard Time","atomUrl":"/feed/Asia!Jerusalem.atom","icalUrl":"/feed/Asia!Jerusalem.ics"},{"id":"Asia/Kamchatka","name":"Petropavlovsk-Kamchatski Summer Time","atomUrl":"/feed/Asia!Kamchatka.atom","icalUrl":"/feed/Asia!Kamchatka.ics"},{"id":"Asia/Krasnoyarsk","name":"Krasnoyarsk Summer Time","atomUrl":"/feed/Asia!Krasnoyarsk.atom","icalUrl":"/feed/Asia!Krasnoyarsk.ics"},{"id":"Asia/Magadan","name":"Magadan Summer Time","atomUrl":"/feed/Asia!Magadan.atom","icalUrl":"/feed/Asia!Magadan.ics"},{"id":"Asia/Nicosia","name":"Eastern European Summer Time","atomUrl":"/feed/Asia!Nicosia.atom","icalUrl":"/feed/Asia!Nicosia.ics"},{"id":"Asia/Novokuznetsk","name":"Novosibirsk Summer Time","atomUrl":"/feed/Asia!Novokuznetsk.atom","icalUrl":"/feed/Asia!Novokuznetsk.ics"},{"id":"Asia/Novosibirsk","name":"Novosibirsk Summer Time","atomUrl":"/feed/Asia!Novosibirsk.atom","icalUrl":"/feed/Asia!Novosibirsk.ics"},{"id":"Asia/Omsk","name":"Omsk Summer Time","atomUrl":"/feed/Asia!Omsk.atom","icalUrl":"/feed/Asia!Omsk.ics"},{"id":"Asia/Sakhalin","name":"Sakhalin Summer Time","atomUrl":"/feed/Asia!Sakhalin.atom","icalUrl":"/feed/Asia!Sakhalin.ics"},{"id":"Asia/Tehran","name":"Iran Standard Time","atomUrl":"/feed/Asia!Tehran.atom","icalUrl":"/feed/Asia!Tehran.ics"},{"id":"Asia/Vladivostok","name":"Vladivostok Summer Time","atomUrl":"/feed/Asia!Vladivostok.atom","icalUrl":"/feed/Asia!Vladivostok.ics"},{"id":"Asia/Yakutsk","name":"Yakutsk Summer Time","atomUrl":"/feed/Asia!Yakutsk.atom","icalUrl":"/feed/Asia!Yakutsk.ics"},{"id":"Asia/Yekaterinburg","name":"Yekaterinburg Summer Time","atomUrl":"/feed/Asia!Yekaterinburg.atom","icalUrl":"/feed/Asia!Yekaterinburg.ics"},{"id":"Asia/Yerevan","name":"Armenia Summer Time","atomUrl":"/feed/Asia!Yerevan.atom","icalUrl":"/feed/Asia!Yerevan.ics"},{"id":"Atlantic/Azores","name":"Azores Summer Time","atomUrl":"/feed/Atlantic!Azores.atom","icalUrl":"/feed/Atlantic!Azores.ics"},{"id":"Atlantic/Bermuda","name":"Atlantic Daylight Time","atomUrl":"/feed/Atlantic!Bermuda.atom","icalUrl":"/feed/Atlantic!Bermuda.ics"},{"id":"Atlantic/Canary","name":"Western European Summer Time","atomUrl":"/feed/Atlantic!Canary.atom","icalUrl":"/feed/Atlantic!Canary.ics"},{"id":"Atlantic/Faroe","name":"Western European Summer Time","atomUrl":"/feed/Atlantic!Faroe.atom","icalUrl":"/feed/Atlantic!Faroe.ics"},{"id":"Atlantic/Madeira","name":"Western European Summer Time","atomUrl":"/feed/Atlantic!Madeira.atom","icalUrl":"/feed/Atlantic!Madeira.ics"},{"id":"Atlantic/Stanley","name":"Falkland Is. Summer Time","atomUrl":"/feed/Atlantic!Stanley.atom","icalUrl":"/feed/Atlantic!Stanley.ics"},{"id":"Australia/Adelaide","name":"Central Summer Time (South Australia)","atomUrl":"/feed/Australia!Adelaide.atom","icalUrl":"/feed/Australia!Adelaide.ics"},{"id":"Australia/Broken_Hill","name":"Central Summer Time (South Australia/New South Wales)","atomUrl":"/feed/Australia!Broken_Hill.atom","icalUrl":"/feed/Australia!Broken_Hill.ics"},{"id":"Australia/Currie","name":"Eastern Summer Time (New South Wales)","atomUrl":"/feed/Australia!Currie.atom","icalUrl":"/feed/Australia!Currie.ics"},{"id":"Australia/Hobart","name":"Eastern Summer Time (Tasmania)","atomUrl":"/feed/Australia!Hobart.atom","icalUrl":"/feed/Australia!Hobart.ics"},{"id":"Australia/Lord_Howe","name":"Lord Howe Summer Time","atomUrl":"/feed/Australia!Lord_Howe.atom","icalUrl":"/feed/Australia!Lord_Howe.ics"},{"id":"Australia/Melbourne","name":"Eastern Summer Time (Victoria)","atomUrl":"/feed/Australia!Melbourne.atom","icalUrl":"/feed/Australia!Melbourne.ics"},{"id":"Australia/Sydney","name":"Eastern Summer Time (New South Wales)","atomUrl":"/feed/Australia!Sydney.atom","icalUrl":"/feed/Australia!Sydney.ics"},{"id":"CET","name":"Central European Summer Time","atomUrl":"/feed/CET.atom","icalUrl":"/feed/CET.ics"},{"id":"CST6CDT","name":"Central Daylight Time","atomUrl":"/feed/CST6CDT.atom","icalUrl":"/feed/CST6CDT.ics"},{"id":"EET","name":"Eastern European Summer Time","atomUrl":"/feed/EET.atom","icalUrl":"/feed/EET.ics"},{"id":"EST5EDT","name":"Eastern Daylight Time","atomUrl":"/feed/EST5EDT.atom","icalUrl":"/feed/EST5EDT.ics"},{"id":"Europe/Amsterdam","name":"Central European Summer Time","atomUrl":"/feed/Europe!Amsterdam.atom","icalUrl":"/feed/Europe!Amsterdam.ics"},{"id":"Europe/Andorra","name":"Central European Summer Time","atomUrl":"/feed/Europe!Andorra.atom","icalUrl":"/feed/Europe!Andorra.ics"},{"id":"Europe/Athens","name":"Eastern European Summer Time","atomUrl":"/feed/Europe!Athens.atom","icalUrl":"/feed/Europe!Athens.ics"},{"id":"Europe/Belgrade","name":"Central European Summer Time","atomUrl":"/feed/Europe!Belgrade.atom","icalUrl":"/feed/Europe!Belgrade.ics"},{"id":"Europe/Berlin","name":"Central European Summer Time","atomUrl":"/feed/Europe!Berlin.atom","icalUrl":"/feed/Europe!Berlin.ics"},{"id":"Europe/Brussels","name":"Central European Summer Time","atomUrl":"/feed/Europe!Brussels.atom","icalUrl":"/feed/Europe!Brussels.ics"},{"id":"Europe/Bucharest","name":"Eastern European Summer Time","atomUrl":"/feed/Europe!Bucharest.atom","icalUrl":"/feed/Europe!Bucharest.ics"},{"id":"Europe/Budapest","name":"Central European Summer Time","atomUrl":"/feed/Europe!Budapest.atom","icalUrl":"/feed/Europe!Budapest.ics"},{"id":"Europe/Chisinau","name":"Eastern European Summer Time","atomUrl":"/feed/Europe!Chisinau.atom","icalUrl":"/feed/Europe!Chisinau.ics"},{"id":"Europe/Copenhagen","name":"Central European Summer Time","atomUrl":"/feed/Europe!Copenhagen.atom","icalUrl":"/feed/Europe!Copenhagen.ics"},{"id":"Europe/Dublin","name":"Irish Summer Time","atomUrl":"/feed/Europe!Dublin.atom","icalUrl":"/feed/Europe!Dublin.ics"},{"id":"Europe/Gibraltar","name":"Central European Summer Time","atomUrl":"/feed/Europe!Gibraltar.atom","icalUrl":"/feed/Europe!Gibraltar.ics"},{"id":"Europe/Helsinki","name":"Eastern European Summer Time","atomUrl":"/feed/Europe!Helsinki.atom","icalUrl":"/feed/Europe!Helsinki.ics"},{"id":"Europe/Istanbul","name":"Eastern European Summer Time","atomUrl":"/feed/Europe!Istanbul.atom","icalUrl":"/feed/Europe!Istanbul.ics"},{"id":"Europe/Kaliningrad","name":"Eastern European Summer Time","atomUrl":"/feed/Europe!Kaliningrad.atom","icalUrl":"/feed/Europe!Kaliningrad.ics"},{"id":"Europe/Kiev","name":"Eastern European Summer Time","atomUrl":"/feed/Europe!Kiev.atom","icalUrl":"/feed/Europe!Kiev.ics"},{"id":"Europe/Lisbon","name":"Western European Summer Time","atomUrl":"/feed/Europe!Lisbon.atom","icalUrl":"/feed/Europe!Lisbon.ics"},{"id":"Europe/London","name":"British Summer Time","atomUrl":"/feed/Europe!London.atom","icalUrl":"/feed/Europe!London.ics"},{"id":"Europe/Luxembourg","name":"Central European Summer Time","atomUrl":"/feed/Europe!Luxembourg.atom","icalUrl":"/feed/Europe!Luxembourg.ics"},{"id":"Europe/Madrid","name":"Central European Summer Time","atomUrl":"/feed/Europe!Madrid.atom","icalUrl":"/feed/Europe!Madrid.ics"},{"id":"Europe/Malta","name":"Central European Summer Time","atomUrl":"/feed/Europe!Malta.atom","icalUrl":"/feed/Europe!Malta.ics"},{"id":"Europe/Minsk","name":"Eastern European Summer Time","atomUrl":"/feed/Europe!Minsk.atom","icalUrl":"/feed/Europe!Minsk.ics"},{"id":"Europe/Monaco","name":"Central European Summer Time","atomUrl":"/feed/Europe!Monaco.atom","icalUrl":"/feed/Europe!Monaco.ics"},{"id":"Europe/Moscow","name":"Moscow Daylight Time","atomUrl":"/feed/Europe!Moscow.atom","icalUrl":"/feed/Europe!Moscow.ics"},{"id":"Europe/Oslo","name":"Central European Summer Time","atomUrl":"/feed/Europe!Oslo.atom","icalUrl":"/feed/Europe!Oslo.ics"},{"id":"Europe/Paris","name":"Central European Summer Time","atomUrl":"/feed/Europe!Paris.atom","icalUrl":"/feed/Europe!Paris.ics"},{"id":"Europe/Prague","name":"Central European Summer Time","atomUrl":"/feed/Europe!Prague.atom","icalUrl":"/feed/Europe!Prague.ics"},{"id":"Europe/Riga","name":"Eastern European Summer Time","atomUrl":"/feed/Europe!Riga.atom","icalUrl":"/feed/Europe!Riga.ics"},{"id":"Europe/Rome","name":"Central European Summer Time","atomUrl":"/feed/Europe!Rome.atom","icalUrl":"/feed/Europe!Rome.ics"},{"id":"Europe/Samara","name":"Samara Summer Time","atomUrl":"/feed/Europe!Samara.atom","icalUrl":"/feed/Europe!Samara.ics"},{"id":"Europe/Simferopol","name":"Eastern European Summer Time","atomUrl":"/feed/Europe!Simferopol.atom","icalUrl":"/feed/Europe!Simferopol.ics"},{"id":"Europe/Sofia","name":"Eastern European Summer Time","atomUrl":"/feed/Europe!Sofia.atom","icalUrl":"/feed/Europe!Sofia.ics"},{"id":"Europe/Stockholm","name":"Central European Summer Time","atomUrl":"/feed/Europe!Stockholm.atom","icalUrl":"/feed/Europe!Stockholm.ics"},{"id":"Europe/Tallinn","name":"Eastern European Summer Time","atomUrl":"/feed/Europe!Tallinn.atom","icalUrl":"/feed/Europe!Tallinn.ics"},{"id":"Europe/Tirane","name":"Central European Summer Time","atomUrl":"/feed/Europe!Tirane.atom","icalUrl":"/feed/Europe!Tirane.ics"},{"id":"Europe/Uzhgorod","name":"Eastern European Summer Time","atomUrl":"/feed/Europe!Uzhgorod.atom","icalUrl":"/feed/Europe!Uzhgorod.ics"},{"id":"Europe/Vaduz","name":"Central European Summer Time","atomUrl":"/feed/Europe!Vaduz.atom","icalUrl":"/feed/Europe!Vaduz.ics"},{"id":"Europe/Vienna","name":"Central European Summer Time","atomUrl":"/feed/Europe!Vienna.atom","icalUrl":"/feed/Europe!Vienna.ics"},{"id":"Europe/Vilnius","name":"Eastern European Summer Time","atomUrl":"/feed/Europe!Vilnius.atom","icalUrl":"/feed/Europe!Vilnius.ics"},{"id":"Europe/Volgograd","name":"Volgograd Summer Time","atomUrl":"/feed/Europe!Volgograd.atom","icalUrl":"/feed/Europe!Volgograd.ics"},{"id":"Europe/Warsaw","name":"Central European Summer Time","atomUrl":"/feed/Europe!Warsaw.atom","icalUrl":"/feed/Europe!Warsaw.ics"},{"id":"Europe/Zaporozhye","name":"Eastern European Summer Time","atomUrl":"/feed/Europe!Zaporozhye.atom","icalUrl":"/feed/Europe!Zaporozhye.ics"},{"id":"Europe/Zurich","name":"Central European Summer Time","atomUrl":"/feed/Europe!Zurich.atom","icalUrl":"/feed/Europe!Zurich.ics"},{"id":"MET","name":"Middle Europe Summer Time","atomUrl":"/feed/MET.atom","icalUrl":"/feed/MET.ics"},{"id":"MST7MDT","name":"Mountain Daylight Time","atomUrl":"/feed/MST7MDT.atom","icalUrl":"/feed/MST7MDT.ics"},{"id":"Pacific/Apia","name":"-10:00","atomUrl":"/feed/Pacific!Apia.atom","icalUrl":"/feed/Pacific!Apia.ics"},{"id":"Pacific/Auckland","name":"New Zealand Daylight Time","atomUrl":"/feed/Pacific!Auckland.atom","icalUrl":"/feed/Pacific!Auckland.ics"},{"id":"Pacific/Chatham","name":"Chatham Daylight Time","atomUrl":"/feed/Pacific!Chatham.atom","icalUrl":"/feed/Pacific!Chatham.ics"},{"id":"Pacific/Easter","name":"Easter Is. Summer Time","atomUrl":"/feed/Pacific!Easter.atom","icalUrl":"/feed/Pacific!Easter.ics"},{"id":"Pacific/Fiji","name":"Fiji Time","atomUrl":"/feed/Pacific!Fiji.atom","icalUrl":"/feed/Pacific!Fiji.ics"},{"id":"PST8PDT","name":"Pacific Daylight Time","atomUrl":"/feed/PST8PDT.atom","icalUrl":"/feed/PST8PDT.ics"},{"id":"WET","name":"Western European Summer Time","atomUrl":"/feed/WET.atom","icalUrl":"/feed/WET.ics"}];
+  
+  	$(document).ready(function() {
+      // make up for mission autofocut
+  		$("#timeZone").focus();
+          // register autocomplete function
+      $("#timeZone").autocomplete(timeZones, {
+        formatItem: function(item) {
+          return item.id;
+        },
+        matchContains: true
+  		}).result(function(event, item) {
+        $("#atomLink").attr("href", item.atomUrl).html("RSS (" + item.id + ")");
+        $("#icalLink").attr("href", item.icalUrl).html("iCalendar (" + item.id + ")");
+      });
+
+      // prevent form submission
+  		$("form").submit(function() {
+  		  return false;
+  		});
+
+      // register tab handler
+  		$("a#homeLink").click(function(event) {
+  			$("div.content").addClass("hidden").removeClass("content");
+  			$("div.home").removeClass("hidden").addClass("content");
+  			event.preventDefault();
+  		});
+  
+  		$("a#aboutLink").click(function(event) {
+  			$("div.content").addClass("hidden").removeClass("content");
+  			$("div.about").removeClass("hidden").addClass("content");
+  			event.preventDefault();
+  		});
+  
+  		$("a#technologyLink").click(function(event) {
+  			$("div.content").addClass("hidden").removeClass("content");
+  			$("div.technology").removeClass("hidden").addClass("content");
+  			event.preventDefault();
+  		});
+  	});
+</script>
+</head>
+<body>
+  <p><img class="bk" src="/_img/bk.png" alt="background" /></p>
+  <div id="quote"><code>Period.millis(zone.getOffset(currentTransition)).normalizedStandard();</code> ~ DateTimeZoneWriter.java</div>
+  <div id="box">
+    <div id="header">Reminder</div>
+    <div id='menu'>
+      <a href="#" id="homeLink">Home</a>|
+      <a href="#" id="aboutLink">About</a>|
+      <a href="#" id="technologyLink">Technology</a>
+    </div>
+    <div id="wrapper">
+      <div class="home content">
+        <span class="content_title">
+          Enter Your Time Zone
+        </span>
+      
+        <form action="/" method="get" accept-charset="UTF-8">
+          <div>
+            <input id="timeZone" name="timeZone" size="50" autofocus="autofocus"/>
+          </div>
+        </form>
+        <div class="content_comments">
+          <a id="atomLink" href=""></a>
+          <a id="icalLink" href=""></a>
+        </div>
+        <br />
+        Enter your timezone in the text field above. A drop down should appear to
+        help you. Once you selected your time zone from the list or entered in
+        into the text field and pressed enter a new link should appear below the
+        text field. Click it and your feed reader should pick it up.
+      </div>
+      <div class="about hidden">
+        DST Offset Change Reminder is a small web application written by
+        Philippe Marschall to scratch a personal itch. The design of this page
+        is based on <a href="http://www.oswd.org/design/information/id/2923/">
+        choc lite</a> by <a href="http://www.oswd.org/user/profile/id/11263">
+        fluxy</a> and some icons come from the
+        <a href="http://tango.freedesktop.org/">Tango Desktop Project</a>. This
+        application runs on <a href="http://code.google.com/appengine/">Goole App
+        Engine for Java&trade;</a>. If you're looking for more information check
+        out the following links:
+        <ul>
+          <li>at
+            <a href="http://appgallery.appspot.com/about_app?app_id=agphcHBnYWxsZXJ5chQLEgxBcHBsaWNhdGlvbnMYvcoHDA">
+            Applications Gallery</a></li>
+          <li><a href="http://reminder.kenai.com">Project Page</a> 
+            (<a href="http://kenai.com/">Project Kenai</a>)</li>
+          <li><a href="http://kenai.com/jira/browse/REMINDER">Issue Tracker</a> 
+            (<a href="http://www.atlassian.com/software/jira/">JIRA</a>)</li>
+          <li><a href="http://kenai.com/svn/reminder~subversion/trunk/reminder">Source Code Repository</a> 
+            (<a href="http://subversion.tigris.org/">Subversion)</a></li>
+          <li><a href="https://www.contrails.ch/hudson/job/reminder/">Continous Integration</a> 
+            (<a href="http://hudson-ci.org/">Hudson</a>) kindly provided by
+            Michael Pellaton</li>
+        </ul>
+      </div>
+      <div class="technology hidden">
+        <p>DST Offset Change Reminder is a small web application written by
+        Philippe Marschall to scratch a personal itch.</p>
+        <p>The following are some of the technologies powering this application:</p>
+        <dl>
+          <dt>Web fontend</dt>
+          <dd><a href="http://jquery.com/">JQuery</a></dd>
+          <dt>Timezone calculations</dt>
+          <dd><a href="http://joda-time.sourceforge.net/">Joda time</a></dd>
+          <dt>Atom feed generation</dt>
+          <dd><a href="http://abdera.apache.org/">Abdera</a></dd>
+          <dt>Feed REST interface</dt>
+          <dd><a href="http://www.jboss.org/resteasy/">RESTeasy</a> 
+          (<a href="http://www.jcp.org/en/jsr/detail?id=311">JAX-RS</a>)</dd>
+          <dt>Logging facade</dt>
+          <dd><a href="http://www.slf4j.org/">SLF4J</a></dd>
+          <dt>Logging implementation</dt>
+          <dd><a href="http://java.sun.com/javase/6/docs/technotes/guides/logging/overview.html">
+          java.util.logging</a> (<a href="http://www.jcp.org/en/jsr/detail?id=311">JSR-47</a>)</dd>
+        </dl>
+        
+        <p>The following are some of the technologies used to build this application:</p>
+        <dl>
+          <dt>IDE</dt>
+          <dd><a href="http://www.eclipse.org/">Eclipse</a></dd>
+          <dt>Build Tool</dt>
+          <dd><a href="http://maven.apache.org/">Maven</a></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  
+  
+  <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+  </script>
+  
+  <script type="text/javascript">
+    try {
+      var pageTracker = _gat._getTracker("UA-8338596-1");
+      pageTracker._trackPageview();
+    } catch(err) {}
+  </script>
+  
+</body>
+</html>
+
